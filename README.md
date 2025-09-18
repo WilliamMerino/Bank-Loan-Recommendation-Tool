@@ -9,6 +9,7 @@ Step 1. Define the data elements we will use to analyze to help us reach the fin
 The elements we will not use from the data include:
 id - we do not need for our use case as we do not need to specifically identify certain people within the dataset
 address_state - not relevant for our use case
+application_type - they are all "INDIVIDUAL"
 emp_title - not relevant for our use case
 verification_status - of their income source is not relevant for our use case
 issue_date - not relevant for our use case
