@@ -21,3 +21,5 @@ member_id - not relevant for our use case
 next meeting we will figure out how to read the data and find the correlation between the elements
 
 in the dataset we acquired, we were unable to find how the original team calculated the debt_to_income ratio - as a result, we have decided to recalculate the debt_to_income ratio using the formula: 
+
+we have decided to clean the data further and reduce the number of home_ownership options avaialble to only include own, mortagage, or rent - the other options included none and other
