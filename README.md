@@ -19,3 +19,5 @@ next_payment_date - not relevant for our use case
 member_id - not relevant for our use case
 
 next meeting we will figure out how to read the data and find the correlation between the elements
+
+in the dataset we acquired, we were unable to find how the original team calculated the debt_to_income ratio - as a result, we have decided to recalculate the debt_to_income ratio using the formula: 
