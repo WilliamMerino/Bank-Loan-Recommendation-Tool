@@ -23,3 +23,5 @@ next meeting we will figure out how to read the data and find the correlation be
 in the dataset we acquired, we were unable to find how the original team calculated the debt_to_income ratio - as a result, we have decided to recalculate the debt_to_income ratio using the formula: 
 
 we have decided to clean the data further and reduce the number of home_ownership options avaialble to only include own, mortagage, or rent - the other options included none and other which we decided to get rid of
+we have also decided to clean the data related to the purpose of the loan to only include - car, house, and educational
+the ones we have decided to delete include - credit card, debt consolidation, home improvement, major purchase, medical, moving, other, renewable energy, small business, vacation, and wedding
