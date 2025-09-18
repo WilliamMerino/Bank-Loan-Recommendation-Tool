@@ -25,3 +25,4 @@ in the dataset we acquired, we were unable to find how the original team calcula
 we have decided to clean the data further and reduce the number of home_ownership options avaialble to only include own, mortagage, or rent - the other options included none and other which we decided to get rid of
 we have also decided to clean the data related to the purpose of the loan to only include - car, house, and educational
 the ones we have decided to delete include - credit card, debt consolidation, home improvement, major purchase, medical, moving, other, renewable energy, small business, vacation, and wedding
+the data is now reflecting those that either rent, own, or have a mortgage which have all applied for loans for car, house, and educational
