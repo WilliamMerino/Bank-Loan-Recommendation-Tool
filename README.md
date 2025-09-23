@@ -26,3 +26,14 @@ we have decided to clean the data further and reduce the number of home_ownershi
 we have also decided to clean the data related to the purpose of the loan to only include - car, house, and educational
 the ones we have decided to delete include - credit card, debt consolidation, home improvement, major purchase, medical, moving, other, renewable energy, small business, vacation, and wedding
 the data is now reflecting those that either rent, own, or have a mortgage which have all applied for loans for car, house, and educational
+
+to install the notebook:
+open Julia in your terminal then -
+
+using Pkg
+Pkg.add("Pluto")
+
+git clone 
+
+using Pluto
+Pluto.run()
