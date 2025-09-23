@@ -37,3 +37,5 @@ git clone https://github.com/WilliamMerino/Bank-Loan-Recommendation-Tool.git
 
 using Pluto
 Pluto.run()
+
+<img width="1000" height="800" alt="generated_image" src="https://github.com/user-attachments/assets/448976b6-8a80-4865-8aa3-72c2c438b6ab" />
