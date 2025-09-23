@@ -33,7 +33,7 @@ open Julia in your terminal then -
 using Pkg
 Pkg.add("Pluto")
 
-git clone 
+git clone https://github.com/WilliamMerino/Bank-Loan-Recommendation-Tool.git
 
 using Pluto
 Pluto.run()
