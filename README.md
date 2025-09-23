@@ -26,3 +26,17 @@ we have decided to clean the data further and reduce the number of home_ownershi
 we have also decided to clean the data related to the purpose of the loan to only include - car, house, and educational
 the ones we have decided to delete include - credit card, debt consolidation, home improvement, major purchase, medical, moving, other, renewable energy, small business, vacation, and wedding
 the data is now reflecting those that either rent, own, or have a mortgage which have all applied for loans for car, house, and educational
+## Run
+
+To run the analysis with the project environment:
+
+```bash
+cd ~/Desktop/BANK_RECOMMENDATION_TOOL/Bank-Loan-Recommendation-Tool
+# install recorded dependencies and precompile
+julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+
+# run the analysis script
+julia --project=. analysis.jl
+```
+
+If you want a reproducible environment to be tracked in git, remove `Manifest.toml` from `.gitignore` and commit the `Manifest.toml` file.
