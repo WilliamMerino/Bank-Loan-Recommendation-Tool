@@ -29,19 +29,7 @@ the data is now reflecting those that either rent, own, or have a mortgage which
 <<<<<<< HEAD
 ## Run
 
-To run the analysis with the project environment:
 
-```bash
-cd ~/Desktop/BANK_RECOMMENDATION_TOOL/Bank-Loan-Recommendation-Tool
-# install recorded dependencies and precompile
-julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
-
-# run the analysis script
-julia --project=. analysis.jl
-```
-
-If you want a reproducible environment to be tracked in git, remove `Manifest.toml` from `.gitignore` and commit the `Manifest.toml` file.
-=======
 
 to install the notebook:
 open Julia in your terminal then -
@@ -56,3 +44,17 @@ Pluto.run()
 
 <img width="1000" height="800" alt="generated_image" src="https://github.com/user-attachments/assets/448976b6-8a80-4865-8aa3-72c2c438b6ab" />
 >>>>>>> origin/main
+
+
+To run the analysis with the project environment:
+
+```bash
+cd ~/Desktop/BANK_RECOMMENDATION_TOOL/Bank-Loan-Recommendation-Tool
+# install recorded dependencies and precompile
+julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+
+# run the analysis script
+julia --project=. analysis.jl
+```
+
+
