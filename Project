@@ -1,63 +1,62 @@
-using XLSX, DataFrames, Statistics
+using CSV
+using DataFrames
+using Statistics
 
-# --- Step 1: Load Excel dataset ---
-function load_data(file_path::String, sheet_name::String)
-    data = DataFrame(XLSX.readtable(file_path, sheet_name)...)
+# --- Step 1: Load CSV dataset ---
+function load_data(file_path::String)
+    data = CSV.read(file_path, DataFrame)
+
     return data
 end
 
 # --- Step 2: Get user input with validation ---
 function get_user_input()
-    # Annual income must be positive
     annual_income = -1.0
     while annual_income <= 0
         println("Enter annual income (positive number, e.g., 60000):")
         try
             annual_income = parse(Float64, readline())
             if annual_income <= 0
-                println("Invalid input. Annual income must be greater than 0.")
+                println("❌ Invalid input. Must be greater than 0.")
             end
         catch
-            println("Invalid input. Please enter a number.")
+            println("❌ Invalid input. Please enter a number.")
         end
     end
 
-    # Loan amount must be positive
     loan_amount = -1.0
     while loan_amount <= 0
         println("Enter loan dollar amount (positive number, e.g., 12000):")
         try
             loan_amount = parse(Float64, readline())
             if loan_amount <= 0
-                println("Invalid input. Loan amount must be greater than 0.")
+                println("❌ Invalid input. Must be greater than 0.")
             end
         catch
-            println("Invalid input. Please enter a number.")
+            println("❌ Invalid input. Please enter a number.")
         end
     end
 
-    # Monthly term restricted to 36 or 60 months
     monthly_term = 0
     while !(monthly_term in (36, 60))
         println("Enter monthly term (choose 36 or 60 months):")
         try
             monthly_term = parse(Int, readline())
             if !(monthly_term in (36, 60))
-                println("Invalid choice. Please enter either 36 or 60.")
+                println("❌ Invalid choice. Must be 36 or 60.")
             end
         catch
-            println("Invalid input. Please enter 36 or 60.")
+            println("❌ Invalid input. Please enter 36 or 60.")
         end
     end
 
-    # Purpose restricted to car, educational, house
     valid_purposes = ["car", "educational", "house"]
     purpose = ""
     while !(lowercase(purpose) in valid_purposes)
         println("Enter purpose (choose from: car, educational, house):")
         purpose = readline()
         if !(lowercase(purpose) in valid_purposes)
-            println("Invalid choice. Please enter car, educational, or house.")
+            println("❌ Invalid choice. Please enter car, educational, or house.")
         end
     end
 
@@ -88,9 +87,9 @@ end
 # --- Step 5: Make Recommendation ---
 function make_recommendation(grade::String)
     if grade in ["A", "B"]
-        return "It is Recommended: Low to medium risk loan."
+        return "✅ Recommended: Low to medium risk loan."
     else
-        return "Not Recommended: High risk loan."
+        return "❌ Not Recommended: High risk loan."
     end
 end
 
@@ -107,8 +106,8 @@ end
 
 # --- Main Program ---
 function main()
-    # Load dataset
-    data = load_data("loan_data.xlsx", "Sheet1")
+    # Load dataset from CSV
+    data = load_data("C:/Users/willi/Documents/MyProject/loan_data.csv")
 
     # Compute DTI column for dataset if missing
     if !(:dti in names(data))
