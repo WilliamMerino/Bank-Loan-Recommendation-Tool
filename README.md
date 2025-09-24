@@ -26,6 +26,8 @@ we have decided to clean the data further and reduce the number of home_ownershi
 we have also decided to clean the data related to the purpose of the loan to only include - car, house, and educational
 the ones we have decided to delete include - credit card, debt consolidation, home improvement, major purchase, medical, moving, other, renewable energy, small business, vacation, and wedding
 the data is now reflecting those that either rent, own, or have a mortgage which have all applied for loans for car, house, and educational
+
+Data from the excel sheet was cleaned up for program readability. This was done after many coding inputs were not able to formulate in a equation that was supposed to be handled. So we went back to the excel and noticed many inconsistencies. For example for terms we had "32 months" this was changed to just "60" since we know this variable is the term_length. Another problem was that for the amount of income some were not rounded to a whole number. So we went through and ensured they were. lastly for the purpose column they were all capitalized so it was corrected to changing everything into lowercase. Once again this was all done to help with consistency and readability for the program.
 <<<<<<< HEAD
 ## Run
 
