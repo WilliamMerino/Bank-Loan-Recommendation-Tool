@@ -19,22 +19,6 @@ using JSON
 using Plots
 
 # ===========================
-# 2. Data Loading & Cleaning
-# ===========================
-function load_and_clean_data(csv_file::String, numeric_cols::Vector{Symbol})
-    df = CSV.read(csv_file, DataFrame)
-    for col in numeric_cols
-        try
-            df[!, col] = parse.(Float64, df[!, col]; raise=false)
-        catch
-            println("Warning: Could not parse column $col to Float64.")
-        end
-    end
-    df_clean = dropmissing(df, numeric_cols)
-    return df_clean
-end
-
-# ===========================
 # 3. Correlation Analysis
 # ===========================
 function compute_and_save_correlation(df_clean::DataFrame, numeric_cols::Vector{Symbol}, out_json::String)
@@ -149,9 +133,6 @@ function main()
         :monthly_installment, :int_rate, :total_accounts, :total_payment
     ]
     out_json = "correlation_matrix.json"
-
-    # --- Load and clean data ---
-    df_clean = load_and_clean_data(csv_file, numeric_cols)
 
     # --- Compute and save correlation matrix ---
     cor_matrix = compute_and_save_correlation(df_clean, numeric_cols, out_json)
