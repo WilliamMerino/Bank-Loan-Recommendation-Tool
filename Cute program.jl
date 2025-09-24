@@ -19,7 +19,7 @@ using JSON
 using Plots
 
 # ===========================
-# 3. Correlation Analysis
+# 2. Correlation Analysis
 # ===========================
 function compute_and_save_correlation(df_clean::DataFrame, numeric_cols::Vector{Symbol}, out_json::String)
     cor_matrix = cor(Matrix(df_clean[:, numeric_cols]))
@@ -54,7 +54,7 @@ function print_correlation_summary(cor_matrix, numeric_cols)
 end
 
 # ===========================
-# 4. User Analysis Tool (REPL)
+# 3. User Analysis Tool (REPL)
 # ===========================
 function analyze_user_input(user_inputs::Dict, columns, cor_matrix)
     println("\n=== Correlation Analysis for Your Inputs ===")
@@ -110,7 +110,7 @@ function interactive_tool(columns, cor_matrix)
 end
 
 # ===========================
-# 5. Visualization
+# 4. Visualization
 # ===========================
 function plot_heatmap(cor_matrix, columns)
     heatmap(
@@ -123,7 +123,7 @@ function plot_heatmap(cor_matrix, columns)
 end
 
 # ===========================
-# 6. Main Script Logic
+# 5. Main Script Logic
 # ===========================
 function main()
     # --- File and columns setup ---
@@ -155,7 +155,7 @@ function main()
 end
 
 # ===========================
-# 7. Run Main
+# 6. Run Main
 # ===========================
 main()
 
