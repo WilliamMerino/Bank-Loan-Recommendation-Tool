@@ -1,222 +1,222 @@
-# ===========================
-# 0. Install Required Packages
-# ===========================
-using Pkg
-Pkg.add("CSV")
-Pkg.add("DataFrames")
-Pkg.add("Statistics")
-Pkg.add("JSON")
-Pkg.add("Plots")
-Pkg.add("ArgParse")  # Optional, not used in this script but available for CLI
+# Cleaned, single-flow script for correlation analysis and simple advisor
+using CSV, DataFrames, Statistics, StatsBase
 
-# ===========================
-# 1. Import Packages
-# ===========================
-using CSV
-using DataFrames
-using Statistics
-using JSON
-using Plots
-
-# ===========================
-# 2. Correlation Analysis
-# ===========================
-function compute_and_save_correlation(df_clean::DataFrame, numeric_cols::Vector{Symbol}, out_json::String)
-    cor_matrix = cor(Matrix(df_clean[:, numeric_cols]))
-    cor_data = Dict(
-        "columns" => string.(numeric_cols),
-        "correlation_matrix" => cor_matrix
-    )
-    open(out_json, "w") do io
-        JSON.print(io, cor_data)
+function find_dataset()
+    candidates = ["Bank loan tool data - financial_loan.csv", "loan_data.csv", "financial_loan.csv"]
+    for f in candidates
+        if isfile(f)
+            return f
+        end
     end
-    return cor_matrix
+    error("No dataset found. Place CSV in project root and re-run.")
+end
+
+function clean_data!(df::DataFrame)
+    # Normalize column names and values we care about
+    if :monthly_term in names(df)
+        try
+            df.monthly_term = parse.(Int, replace.(strip.(string.(df.monthly_term)), r"[^0-9]" => ""))
+        catch
+            # leave as-is
+        end
+    end
+    if :purpose in names(df)
+        df.purpose = lowercase.(strip.(string.(df.purpose)))
+    end
+    if :debt_to_income_ratio in names(df) && !(:dti in names(df))
+        try
+            df.dti = Float64.(df.debt_to_income_ratio)
+        catch
+            try
+                df.dti = parse.(Float64, replace.(string.(df.debt_to_income_ratio), r"[^0-9\.]" => ""))
+            catch
+            end
+        end
+    end
+    return df
+end
+
+function parse_rate(x)
+    if x === missing || x === nothing
+        return NaN
+    elseif x isa Number
+        return Float64(x)
+    else
+        s = strip(string(x))
+        s = replace(s, "%" => "")
+        s = replace(s, r"[^0-9\.]" => "")
+        try
+            return parse(Float64, s)
+        catch
+            return NaN
+        end
+    end
+end
+
+function avg_rate_by_grade(df::DataFrame)
+    # detect int rate column by several possible names (case-insensitive)
+    candidates = [:int_rate, :"int rate", :interest_rate, :intRate]
+    col = nothing
+    for c in candidates
+        if c in names(df)
+            col = c
+            break
+        end
+    end
+    if col === nothing
+        # try a case-insensitive search
+        for c in names(df)
+            if occursin("int", lowercase(string(c))) && occursin("rate", lowercase(string(c)))
+                col = c
+                break
+            end
+        end
+    end
+    if col === nothing
+        error("Dataset missing `int_rate` column")
+    end
+    df.int_rate_parsed = parse_rate.(df[!, col])
+    g = groupby(df, :grade)
+    res = combine(g, :int_rate_parsed => (x->mean(skipmissing(filter(!isnan, x)))) => :avg_int_rate)
+    return sort(res, :grade)
+end
+
+function compute_correlation(df::DataFrame, numeric_cols::Vector{Symbol})
+    # helper to coerce a column to Float64 vector (non-parsable entries become missing)
+    function tofloatcol(colvals)
+        out = Float64[]
+        for v in colvals
+            s = replace(string(v), '%'=>"")
+            s = replace(s, r"[^0-9\.-]"=>"")
+            if isempty(s)
+                push!(out, NaN)
+            else
+                try
+                    push!(out, parse(Float64, s))
+                catch
+                    push!(out, NaN)
+                end
+            end
+        end
+        return out
+    end
+
+    n = length(numeric_cols)
+    mat = zeros(Float64, n, n)
+    for i in 1:n
+        for j in 1:n
+            a = numeric_cols[i]
+            b = numeric_cols[j]
+            if a in names(df) && b in names(df)
+                x = tofloatcol(df[!, a])
+                y = tofloatcol(df[!, b])
+                # replace NaN with missing for cor calculation
+                xmiss = map(v->isnan(v) ? missing : v, x)
+                ymiss = map(v->isnan(v) ? missing : v, y)
+                try
+                    mat[i, j] = cor(skipmissing(xmiss), skipmissing(ymiss))
+                catch
+                    mat[i, j] = NaN
+                end
+            else
+                mat[i, j] = NaN
+            end
+        end
+    end
+    return mat
 end
 
 function print_correlation_summary(cor_matrix, numeric_cols)
-    max_corr, min_corr = 0.0, 1.0
-    max_pair, min_pair = ("", ""), ("", "")
-    for i in 1:length(numeric_cols), j in 1:length(numeric_cols)
-        if i != j
-            c = cor_matrix[i, j]
-            if abs(c) > abs(max_corr)
-                max_corr = c
-                max_pair = (string(numeric_cols[i]), string(numeric_cols[j]))
-            end
-            if abs(c) < abs(min_corr)
-                min_corr = c
-                min_pair = (string(numeric_cols[i]), string(numeric_cols[j]))
-            end
+    max_corr, max_pair = -Inf, ("", "")
+    min_corr, min_pair = Inf, ("", "")
+    n = length(numeric_cols)
+    for i in 1:n, j in i+1:n
+        c = cor_matrix[i, j]
+        if c > max_corr
+            max_corr = c
+            max_pair = (string(numeric_cols[i]), string(numeric_cols[j]))
+        end
+        if c < min_corr
+            min_corr = c
+            min_pair = (string(numeric_cols[i]), string(numeric_cols[j]))
         end
     end
-    println("\nStrongest correlation: $max_pair = $max_corr")
-    println("Weakest correlation: $min_pair = $min_corr")
+    println("Strongest positive correlation: $(max_pair) = $(round(max_corr, digits=3))")
+    println("Strongest negative correlation: $(min_pair) = $(round(min_corr, digits=3))")
 end
 
-# ===========================
-# 3. User Analysis Tool (REPL)
-# ===========================
-function analyze_user_input(user_inputs::Dict, columns, cor_matrix)
-    println("\n=== Correlation Analysis for Your Inputs ===")
-    for (var, value) in user_inputs
-        idx = findfirst(==(var), columns)
-        if isnothing(idx)
-            println("Variable $var not found in correlation matrix.")
-            continue
-        end
-        println("\nCorrelations for $var:")
-        for (j, col) in enumerate(columns)
-            if col != var
-                corr = cor_matrix[idx, j]
-                print("  $col: $(round(corr, digits=3))")
-                if abs(corr) > 0.7
-                    println(" (Strong relationship)")
-                elseif abs(corr) > 0.3
-                    println(" (Moderate relationship)")
-                else
-                    println(" (Weak relationship)")
-                end
-            end
-        end
-    end
-end
-
-function interactive_tool(columns, cor_matrix)
-    println("\n=== Interactive Correlation Tool ===")
-    println("Enter variable names (from: $(columns)) and values (comma-separated, e.g. annual_income=50000,loan_dollar_amount=10000)")
-    println("Type 'exit' to quit.")
-    while true
-        print("\nYour input: ")
-        user_line = readline()
-        if lowercase(strip(user_line)) == "exit"
-            println("Exiting tool.")
-            break
-        end
-        user_inputs = Dict{String, Float64}()
-        for pair in split(user_line, ',')
-            if occursin("=", pair)
-                k, v = split(pair, '=')
-                k = strip(k)
-                v = tryparse(Float64, strip(v))
-                if v !== nothing
-                    user_inputs[k] = v
-                else
-                    println("Invalid value for $k, skipping.")
-                end
-            end
-        end
-        analyze_user_input(user_inputs, columns, cor_matrix)
-    end
-end
-
-# ===========================
-# 4. Visualization
-# ===========================
-function plot_heatmap(cor_matrix, columns)
-    heatmap(
-        cor_matrix,
-        xticks=(1:length(columns), columns),
-        yticks=(1:length(columns), columns),
-        c=:coolwarm,
-        title="Correlation Matrix Heatmap"
-    )
-end
-
-# ===========================
-# 5. Main Script Logic
-# ===========================
-function main()
-    # --- File and columns setup ---
-    csv_file = "CSV/Bank loan tool data - financial_loan.csv"
-    numeric_cols = [
-        :annual_income, :loan_dollar_amount, :debt_to_income_ratio,
-        :monthly_installment, :int_rate, :total_accounts, :total_payment
-    ]
-    out_json = "correlation_matrix.json"
-
-    # --- Compute and save correlation matrix ---
-    cor_matrix = compute_and_save_correlation(df_clean, numeric_cols, out_json)
-    columns = string.(numeric_cols)
-
-    # --- Print correlation matrix and summary ---
-    println("\n=== Correlation Matrix ===")
-    println(cor_matrix)
-    print_correlation_summary(cor_matrix, numeric_cols)
-
-    # --- Interactive user tool ---
-    interactive_tool(columns, cor_matrix)
-
-    # --- Visualization ---
-    println("\nDo you want to plot the correlation matrix heatmap? (y/n)")
-    ans = readline()
-    if lowercase(strip(ans)) == "y"
-        plot_heatmap(cor_matrix, columns)
-    end
-end
-
-# ===========================
-# 6. Run Main
-# ===========================
-main()
-
-using CSV, DataFrames, Statistics, JSON
-
-function get_user_input(prompt::String, parse_func)
-    while true
-        print(prompt)
-        input = readline()
-        val = parse_func(input)
-        if val !== nothing
-            return val
-        else
-            println("Invalid input. Please try again.")
-        end
-    end
-end
-
-function main()
-    println("Welcome to the Loan Application Advisor!")
-    println("Please answer a few questions about your loan inquiry.\n")
-
-    # Prompt for user details
-    purpose = get_user_input("What is the purpose of your loan? (e.g., car, educational): ", x->strip(x))
-    annual_income = get_user_input("What is your annual income (in USD)? ", x->tryparse(Float64, strip(x)))
-    loan_amount = get_user_input("What is the loan amount you want (in USD)? ", x->tryparse(Float64, strip(x)))
-    monthly_term = get_user_input("What is the loan term? (e.g., 36 months): ", x->strip(x))
-    home_ownership = get_user_input("What is your home ownership status? (MORTGAGE, RENT, OWN): ", x->strip(x))
-    debt_to_income = get_user_input("What is your debt-to-income ratio (e.g., 0.15)? ", x->tryparse(Float64, strip(x)))
-
-    # Load data and correlation matrix (done in background)
-    df = CSV.read("CSV/Bank loan tool data - financial_loan.csv", DataFrame)
-    # (Assume you have already saved a correlation matrix and/or trained a model)
-    # For demo, we'll just compare to similar applicants in the dataset
-
-    # Find similar applicants (simple filter)
-    similar = filter(row -> 
-        row.purpose == purpose &&
-        abs(row.annual_income - annual_income) < 10000 &&
-        abs(row.loan_dollar_amount - loan_amount) < 2000 &&
-        row.home_ownership == home_ownership &&
-        abs(row.debt_to_income_ratio - debt_to_income) < 0.05,
-        df
-    )
-
-    # Grade logic (demo: use most common grade among similar applicants)
-    grade = isempty(similar) ? "N/A" : mode(similar.grade)
-    status = isempty(similar) ? "N/A" : mode(similar.loan_status)
-
-    println("\n--- Loan Application Summary ---")
-    if isempty(similar)
-        println("We couldn't find many applicants with similar profiles in our data.")
-        println("Please check your inputs or try again with different values.")
+function find_similar_applicants(df::DataFrame; purpose="car", annual_income=60000.0, loan_amount=12000.0, home_ownership="RENT", dti=0.2)
+    if :debt_to_income_ratio in names(df)
+        df_dti = Float64.(replace.(string.(df.debt_to_income_ratio), r"[^0-9\.]"=>""))
+        df[!, :dti_tmp] = df_dti
+    elseif :dti in names(df)
+        df[!, :dti_tmp] = Float64.(df.dti)
     else
-        println("Based on similar applicants in our data:")
-        println("  - Most common loan grade: $grade")
-        println("  - Most common loan outcome: $status")
-        println("  - Number of similar applicants found: $(nrow(similar))")
-        println("  - Example: $(first(similar, 1))")
+        df[!, :dti_tmp] = fill(NaN, nrow(df))
     end
-    println("\nThank you for using the Loan Application Advisor!")
+    sim = filter(row -> lowercase(string(row.purpose)) == lowercase(purpose) &&
+                  abs(float(row.annual_income) - annual_income) < 15000 &&
+                  abs(float(row.loan_dollar_amount) - loan_amount) < 5000 &&
+                  (isempty(string(row.home_ownership)) || uppercase(string(row.home_ownership)) == uppercase(home_ownership)) &&
+                  !isnan(row.dti_tmp) && abs(row.dti_tmp - dti) < 0.1,
+                  df)
+    return sim
+end
+
+function advisor_demo(df::DataFrame)
+    demo = Dict(
+        :purpose => "car",
+        :annual_income => 60000.0,
+        :loan_amount => 12000.0,
+        :home_ownership => "RENT",
+        :dti => 0.2
+    )
+    sim = find_similar_applicants(df; purpose=demo[:purpose], annual_income=demo[:annual_income], loan_amount=demo[:loan_amount], home_ownership=demo[:home_ownership], dti=demo[:dti])
+    if isempty(sim)
+        println("Demo advisor: no similar applicants found for demo inputs.")
+    else
+        println("Demo advisor: found $(nrow(sim)) similar applicants.")
+        if :grade in names(sim)
+            println("Most common grade among similar applicants: ", mode(sim.grade))
+        end
+        if :loan_status in names(sim)
+            println("Most common loan status: ", mode(sim.loan_status))
+        end
+    end
+end
+
+function main()
+    csv = find_dataset()
+    println("Loading dataset: ", csv)
+    df = CSV.read(csv, DataFrame)
+    clean_data!(df)
+
+    numeric_cols = [:annual_income, :loan_dollar_amount, :debt_to_income_ratio, :monthly_installment, :int_rate, :total_accounts, :total_payment]
+    existing_numeric = [c for c in numeric_cols if c in names(df)]
+    if isempty(existing_numeric)
+        println("No numeric columns found for correlation analysis.")
+    else
+        cor_matrix = compute_correlation(df, existing_numeric)
+        println("\nCorrelation matrix for: ", existing_numeric)
+        show(cor_matrix)
+        println()
+        print_correlation_summary(cor_matrix, existing_numeric)
+    end
+
+    println("\nAverage interest rate by grade:")
+    try
+        tbl = avg_rate_by_grade(df)
+        for r in eachrow(tbl)
+            rate = r.avg_int_rate
+            rate_pct = rate <= 1.0 ? rate*100 : rate
+            println("Grade $(r.grade) => $(round(rate_pct, digits=2))%")
+        end
+    catch e
+        println("Could not compute interest rates by grade: ", e)
+    end
+
+    println("\nRunning advisor demo (non-interactive)...")
+    advisor_demo(df)
 end
 
 main()
