@@ -27,7 +27,6 @@ function compute_correlation(df::DataFrame, numeric_cols::Vector{Symbol})
             if a in names(df) && b in names(df)
                 x = tofloatcol(df[!, a])
                 y = tofloatcol(df[!, b])
-                # replace NaN with missing for cor calculation
                 xmiss = map(v -> isnan(v) ? missing : v, x)
                 ymiss = map(v -> isnan(v) ? missing : v, y)
                 try
@@ -41,23 +40,4 @@ function compute_correlation(df::DataFrame, numeric_cols::Vector{Symbol})
         end
     end
     return mat
-
-function main()
-    csv = find_dataset()
-    println("Loading dataset: ", csv)
-    df = CSV.read(csv, DataFrame)
-    clean_data!(df)
-
-    numeric_cols = [:annual_income, :loan_dollar_amount, :debt_to_income_ratio, :monthly_installment, :int_rate, :total_accounts, :total_payment]
-    existing_numeric = [c for c in numeric_cols if c in names(df)]
-    if isempty(existing_numeric)
-        println("No numeric columns found for correlation analysis.")
-    else
-        cor_matrix = compute_correlation(df, existing_numeric)
-        println("\nCorrelation matrix for: ", existing_numeric)
-        show(cor_matrix)
-        println()
-        print_correlation_summary(cor_matrix, existing_numeric)
-    end
-    ...
-end
+end  # ← This was missing!
