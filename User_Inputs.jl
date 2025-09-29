@@ -51,3 +51,10 @@ function get_user_input()
 
     return (annual_income, loan_amount, monthly_term, lowercase(purpose))
 end
+
+# --- Step 2: Compute Monthly DTI ---
+function compute_dti(annual_income, loan_amount, monthly_term)
+    monthly_income = annual_income / 12
+    monthly_payment = loan_amount / monthly_term
+    return monthly_payment / monthly_income
+end
