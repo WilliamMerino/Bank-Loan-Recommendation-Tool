@@ -51,7 +51,7 @@ julia --project=. analysis.jl
 Workflow for the tool -
 
 1. run the correlation matrix for the data
-2. run the description of the data
+2. run the description of the data to establish thresholds for grades
 3. a code that can produce the grading criteria for the past loans
 4. takes the users inputs
 5. Main function which runs all of it in the background
