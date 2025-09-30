@@ -40,4 +40,4 @@ function compute_correlation(df::DataFrame, numeric_cols::Vector{Symbol})
         end
     end
     return mat
-end  # ← This was missing!
+end
