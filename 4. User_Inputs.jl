@@ -9,7 +9,7 @@ function get_user_input()
                 println("❌ Invalid input. Must be greater than 0.")
             end
         catch
-            println("❌ Invalid input. Please enter a number.")
+            println("❌ Invalid input. Please enter a number, e.g., 60000")
         end
     end
 
@@ -22,7 +22,7 @@ function get_user_input()
                 println("❌ Invalid input. Must be greater than 0.")
             end
         catch
-            println("❌ Invalid input. Please enter a number.")
+            println("❌ Invalid input. Please enter a number, e.g., 12000")
         end
     end
 
@@ -42,7 +42,7 @@ function get_user_input()
     valid_purposes = ["car", "educational", "house"]
     purpose = ""
     while !(lowercase(purpose) in valid_purposes)
-        println("Enter purpose (choose from: car, educational, house):")
+        println("Enter purpose (choose from: car, educational, or house):")
         purpose = readline()
         if !(lowercase(purpose) in valid_purposes)
             println("❌ Invalid choice. Please enter car, educational, or house.")
