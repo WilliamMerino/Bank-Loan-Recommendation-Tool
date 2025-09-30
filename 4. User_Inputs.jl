@@ -1,3 +1,5 @@
+# 4. User_Inputs.jl
+
 # --- Step 1: Get user input with validation ---
 function get_user_input()
     annual_income = -1.0
@@ -58,3 +60,9 @@ function compute_dti(annual_income, loan_amount, monthly_term)
     monthly_payment = loan_amount / monthly_term
     return monthly_payment / monthly_income
 end
+
+# --- Step 3: Run the script ---
+annual_income, loan_amount, monthly_term, purpose = get_user_input()
+dti = compute_dti(annual_income, loan_amount, monthly_term)
+println("✅ Purpose: $(purpose)")
+println("✅ Monthly DTI: $(round(dti * 100; digits=2))%")
