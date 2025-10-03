@@ -2,7 +2,7 @@
 using CSV, DataFrames, Statistics
 
 function find_dataset()
-    candidates = ["Bank loan tool data - financial_loan.csv", "loan_data.xlsx", "loan_data.csv", "financial_loan.csv"]
+    candidates = ["Bank loan tool data - financial_loan.csv", "loan_data.xlsx", "0. loan_data.csv", "financial_loan.csv"]
     for f in candidates
         if isfile(f)
             return f 

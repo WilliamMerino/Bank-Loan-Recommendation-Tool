@@ -4,9 +4,9 @@ include("calculations.jl")
 include("reporting.jl")
 
 function main()
-    println("Enter path to CSV dataset (or press Enter for default 'data/loans.csv'):")
+    println("Enter path to CSV dataset (or press Enter for default '0. loan_data.csv'):")
     path = readline()
-    file_path = isempty(path) ? joinpath(@__DIR__, "../data/loans.csv") : path
+    file_path = isempty(path) ? joinpath(@__DIR__, "../0. loan_data.csv") : path
 
     data = CSV.read(file_path, DataFrame)
 
