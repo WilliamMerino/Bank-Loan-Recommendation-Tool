@@ -85,11 +85,11 @@ function main()
     println("It provides personalized recommendations, compares your application to similar loans, and offers insights to improve affordability.")
     println("")
     println("How to use:")
-    println("1. Provide the path to a CSV file containing loan data (columns like annual_income, loan_amount, term, purpose, grade, dti, etc.).")
+    println("1. Provide the path to the CSV file containing the loan data.")
     println("2. Enter your applicant details: annual income, loan amount, term (36 or 60 months), purpose (car, educational, house), and number of existing debts.")
     println("3. Review the grade, recommendation, similar loans, and summary.")
-    println("4. Process multiple loans or exit anytime.")
-    println("Note: The tool derives purpose-specific thresholds from your data for accurate grading.")
+    println("4. Process another loan or exit anytime.")
+    println("Note: The tool derives purpose-specific thresholds from the data for accurate grading.")
     println("")
 
     default_path = joinpath(@__DIR__, "loan_data.csv")
@@ -294,7 +294,7 @@ function main()
         formatted_avg_installment = isnan(avg_monthly_installment) ? "N/A" : format_currency(avg_monthly_installment)
         formatted_avg_rate = isnan(avg_int_rate) ? "N/A" : "$(round(avg_int_rate * 100; digits=2))%"
         println("\nSummary:")
-        println("For your proposed $purpose loan: With an annual income of $formatted_income, requesting $formatted_loan over $monthly_term months, and having $num_debts existing debts, we've calculated your Debt-to-Income (DTI) ratio as $applicant_dti. Compared to the average DTI of $avg_dti for similar loans in our dataset, this results in a grade of $assigned_grade. $recommendation Additionally, cohort averages include: Monthly Installment $formatted_avg_installment, Interest Rate $formatted_avg_rate, Total Accounts $(isnan(avg_total_accounts) ? "N/A" : avg_total_accounts). Review the top similar loans above for more context on comparable applicants.")
+        println("For your proposed $purpose loan: With an annual income of $formatted_income, requesting $formatted_loan over $monthly_term months, and having $num_debts existing debts, we've calculated your Debt-to-Income (DTI) ratio as $applicant_dti. Compared to the average DTI of $avg_dti for similar loans in the dataset, this results in a grade of $assigned_grade. $recommendation Additionally, cohort averages include: Monthly Installment $formatted_avg_installment, Interest Rate $formatted_avg_rate, Total Accounts $(isnan(avg_total_accounts) ? "N/A" : avg_total_accounts). Review the top similar loans above for more context on comparable applicants.")
 
         println("\nProcess another loan? (y/n): ")
         if lowercase(strip(readline())) != "y"

@@ -1,0 +1,6 @@
+{
+  "julia.environmentPath": ".",
+  "julia.usePlotPane": false,
+  "julia.NumThreads": "auto",
+  "julia.executeFileInNewProcess": true
+}

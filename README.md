@@ -1,59 +1,44 @@
 # Bank-Loan-Recommendation-Tool
 
-We are going to use past financial data for loans that have been applied for at a bank. We are able to see through all this past data trends of what would be seen as a risk to give certain people loans. We want to be able to create a bank loan recommendation tool.
+This tool grades loan applications using historical loan data. It calculates Debt-to-Income (DTI), derives purpose-specific thresholds, assigns a grade (A–G), and provides a recommendation with similar-loan comparisons.
 
-Our Goal: We want to create a tool where a person can go online and see the "grade" or probability that they will get the loan if they were to apply for it
+Project has been refactored into a clean, testable module structure.
 
-Step 1. Define the data elements we will use to analyze to help us reach the final outcome
+Structure
+- src/BankLoanRecommendationTool.jl: Module entry, exports
+- src/data.jl: Data loading and normalization
+- src/grading.jl: DTI calc, threshold derivation, grade assignment
+- src/formatting.jl: Currency/number formatting and table printing
+- src/similarity.jl: Similar loans by DTI
+- src/reporting.jl: Recommendation text
+- src/main.jl: CLI entry (interactive)
+- data/loan_data.csv: Sample dataset
+- docs/: Reference materials
+- examples/bank_loan_advisor_legacy.jl: Archived legacy script
+- test/: Minimal unit tests for each module
 
-The elements we will not use from the data include:
-id - we do not need for our use case as we do not need to specifically identify certain people within the dataset
-address_state - not relevant for our use case
-application_type - they are all "INDIVIDUAL"
-emp_title - not relevant for our use case
-verification_status - of their income source is not relevant for our use case
-issue_date - not relevant for our use case
-last_credit_pull_date - not relevant for our use case
-last_payment_date - not relevant for our use case
-next_payment_date - not relevant for our use case
-member_id - not relevant for our use case
+Setup
+- Optional: Install deps (Project.toml provided):
+  - julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+  - Note: src/main.jl will auto-activate the project and install CSV/DataFrames if missing.
 
-next meeting we will figure out how to read the data and find the correlation between the elements
+Run (CLI)
+- Easiest (one file):
+  - julia run.jl
+- Or directly:
+  - julia --project src/main.jl
+- When prompted, press Enter to use the included data/loan_data.csv or provide a custom CSV path.
 
-in the dataset we acquired, we were unable to find how the original team calculated the debt_to_income ratio - as a result, we have decided to recalculate the debt_to_income ratio using the formula: 
+Run Tests
+- From repo root:
+  - julia --project test/runtests.jl
 
-we have decided to clean the data further and reduce the number of home_ownership options avaialble to only include own, mortagage, or rent - the other options included none and other which we decided to get rid of
-we have also decided to clean the data related to the purpose of the loan to only include - car, house, and educational
-the ones we have decided to delete include - credit card, debt consolidation, home improvement, major purchase, medical, moving, other, renewable energy, small business, vacation, and wedding
-the data is now reflecting those that either rent, own, or have a mortgage which have all applied for loans for car, house, and educational
+CSV Expectations
+- Required columns (case-insensitive names are normalized):
+  - annual_income, loan_amount (or loan_dollar_amount), term, purpose, grade, dti (or debt_to_income_ratio)
+- Optional columns used for reporting if present:
+  - monthly_installment (from installment), int_rate, total_accounts (from total_acc)
+- The loader normalizes: purpose → lowercase, grade → uppercase, computes debt_to_income_ratio if missing.
 
-Data from the excel sheet was cleaned up for program readability. This was done after many coding inputs were not able to formulate in a equation that was supposed to be handled. So we went back to the excel and noticed many inconsistencies. For example for terms we had "32 months" this was changed to just "60" since we know this variable is the term_length. Another problem was that for the amount of income some were not rounded to a whole number. So we went through and ensured they were. lastly for the purpose column they were all capitalized so it was corrected to changing everything into lowercase. Once again this was all done to help with consistency and readability for the program.
-<<<<<<< HEAD
-## Run
-
-
-git clone https://github.com/WilliamMerino/Bank-Loan-Recommendation-Tool.git
-
-<img width="1000" height="800" alt="generated_image" src="https://github.com/user-attachments/assets/448976b6-8a80-4865-8aa3-72c2c438b6ab" />
->>>>>>> origin/main
-
-
-To run the analysis with the project environment:
-
-```bash
-cd ~/Desktop/BANK_RECOMMENDATION_TOOL/Bank-Loan-Recommendation-Tool
-# install recorded dependencies and precompile
-julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
-
-# run the analysis script
-julia --project=. analysis.jl
-```
-Workflow for the tool -
-
-1. run the correlation matrix for the data
-2. run the description of the data to establish thresholds for grades
-3. the interpretation of the grading criteria for the past loans
-4. takes the users inputs and establishes thresholds
-5. main function which runs all of it in the background
-6. the user interface that produces the final result
-
+Notes
+- Older exploratory scripts have been deprecated in favor of the new modules and tests.

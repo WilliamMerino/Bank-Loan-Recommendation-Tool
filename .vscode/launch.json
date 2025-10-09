@@ -1,0 +1,27 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Loan Tool (src/main.jl)",
+      "type": "julia",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/main.jl",
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false,
+      "juliaEnv": "${workspaceFolder}",
+      "env": {},
+      "args": []
+    },
+    {
+      "name": "Run Tests (test/runtests.jl)",
+      "type": "julia",
+      "request": "launch",
+      "program": "${workspaceFolder}/test/runtests.jl",
+      "cwd": "${workspaceFolder}",
+      "stopOnEntry": false,
+      "juliaEnv": "${workspaceFolder}",
+      "args": []
+    }
+  ]
+}
+
