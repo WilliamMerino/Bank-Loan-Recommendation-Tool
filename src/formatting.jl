@@ -1,5 +1,12 @@
 using Statistics
-using PrettyTables
+
+# Try to use PrettyTables if available; otherwise fall back to a simple ASCII table
+const HAS_PRETTYTABLES = try
+    @eval import PrettyTables
+    true
+catch
+    false
+end
 
 function format_number_with_commas(n::Real; digits=2)::String
     if isnan(n) || isinf(n)
@@ -47,12 +54,30 @@ function format_table_row(row::Vector{String}, widths::Vector{Int}, alignments::
 end
 
 function print_table(headers::Vector{String}, rows::Vector{Vector{String}}; alignments::Union{Nothing, Vector{Symbol}}=nothing)
-    data = rows
-    alignment_pt = if alignments === nothing
-        :l
+    if HAS_PRETTYTABLES
+        data = rows
+        alignment_pt = if alignments === nothing
+            :l
+        else
+            # Map :left/:right to PrettyTables symbols :l/:r
+            map(a -> a === :right ? :r : :l, alignments)
+        end
+        PrettyTables.pretty_table(data; header=headers, alignment=alignment_pt)
     else
-        # Map :left/:right to PrettyTables symbols :l/:r
-        map(a -> a === :right ? :r : :l, alignments)
+        # Fallback ASCII renderer
+        if alignments === nothing
+            alignments = fill(:left, length(headers))
+        end
+        header_alignments = fill(:left, length(headers))
+        widths = compute_column_widths(headers, rows)
+        top_border = make_separator('-', widths)
+        header_border = make_separator('=', widths)
+        println(top_border)
+        println(format_table_row(headers, widths, header_alignments))
+        println(header_border)
+        for row in rows
+            println(format_table_row(row, widths, alignments))
+        end
+        println(top_border)
     end
-    pretty_table(data; header=headers, alignment=alignment_pt)
 end
