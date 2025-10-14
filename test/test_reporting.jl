@@ -1,4 +1,5 @@
 using Test
+push!(LOAD_PATH, joinpath(@__DIR__, "..", "src"))
 using BankLoanRecommendationTool
 
 @testset "reporting" begin
@@ -6,4 +7,3 @@ using BankLoanRecommendationTool
     @test occursin("Medium", make_recommendation("C"))
     @test occursin("High", make_recommendation("G"))
 end
-

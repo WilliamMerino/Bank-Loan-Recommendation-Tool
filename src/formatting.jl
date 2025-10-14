@@ -9,10 +9,10 @@ function format_number_with_commas(n::Real; digits=2)::String
     if occursin('.', s)
         parts = split(s, '.', limit=2)
         int_part = parts[1]
-        dec_part = '.' * rpad(parts[2], digits, '0')
+        dec_part = "." * rpad(parts[2], digits, '0')
     else
         int_part = s
-        dec_part = '.' * repeat('0', digits)
+        dec_part = "." * repeat("0", digits)
     end
     int_part = replace(int_part, r"(\d)(?=(\d{3})+(?!\d))" => s"\1,")
     return int_part * dec_part
@@ -61,4 +61,3 @@ function print_table(headers::Vector{String}, rows::Vector{Vector{String}}; alig
     end
     println(top_border)
 end
-

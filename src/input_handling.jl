@@ -19,7 +19,14 @@ function get_user_input()
         return s
     end
     # Detect non-interactive contexts (e.g., VS Code Run button)
-    noninteractive = (haskey(ENV, "VSCODE_PID") && get(ENV, "BLRT_ALLOW_PROMPT", "0") != "1") || get(ENV, "BLRT_NONINTERACTIVE", "0") == "1"
+    # Allow opting-in to prompts via BLRT_ALLOW_PROMPT or blrt_allow_prompt with common truthy values
+    is_truthy(v) = begin
+        t = lowercase(strip(string(v)))
+        t in ("1", "true", "yes", "y")
+    end
+    allow_prompt = any(haskey(ENV, k) && is_truthy(ENV[k]) for k in ("BLRT_ALLOW_PROMPT", "blrt_allow_prompt"))
+    force_noninteractive = any(haskey(ENV, k) && is_truthy(ENV[k]) for k in ("BLRT_NONINTERACTIVE", "blrt_noninteractive"))
+    noninteractive = (haskey(ENV, "VSCODE_PID") && !allow_prompt) || force_noninteractive
     if noninteractive
         # Pull values from environment or use sensible defaults, and echo to user
         annual_income = try parse(Float64, get(ENV, "BLRT_ANNUAL_INCOME", "60000")) catch; 60000.0 end

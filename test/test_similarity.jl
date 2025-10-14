@@ -1,5 +1,6 @@
 using Test
 using DataFrames
+push!(LOAD_PATH, joinpath(@__DIR__, "..", "src"))
 using BankLoanRecommendationTool
 
 @testset "similarity" begin
@@ -7,4 +8,3 @@ using BankLoanRecommendationTool
     sims = top_similar_by_dti(cohort, 0.1; top_n=2)
     @test nrow(sims) == 2
 end
-
