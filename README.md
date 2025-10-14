@@ -18,16 +18,23 @@ Structure
 - test/: Minimal unit tests for each module
 
 Setup
-- Optional: Install deps (Project.toml provided):
+- Clone and install dependencies
+  - git clone https://github.com/<your-account>/Bank-Loan-Recommendation-Tool.git
+  - cd Bank-Loan-Recommendation-Tool
   - julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
-  - Note: src/main.jl will auto-activate the project and install CSV/DataFrames if missing.
+  - The project now has a valid Project.toml (name/uuid) so `using BankLoanRecommendationTool` works after `] activate .`.
+  - Note: src/main.jl will also attempt to bootstrap CSV/DataFrames if missing.
 
 Run (CLI)
-- Easiest (one file):
+- Option A: one-file launcher
   - julia run.jl
-- Or directly:
-  - julia --project src/main.jl
-- When prompted, press Enter to use the included data/loan_data.csv or provide a custom CSV path.
+- Option B: as a package entry
+  - julia --project=.
+  - julia> using BankLoanRecommendationTool
+  - julia> BankLoanRecommendationTool.start()
+- Option C: run the CLI source directly
+  - julia --project=. src/main.jl
+- Tip (VS Code): If prompts are skipped on first run, set BLRT_ALLOW_PROMPT=1 in your environment to force interactive input.
 
 Run Tests
 - From repo root:
