@@ -27,6 +27,14 @@ Setup
   - Note: src/main.jl will also attempt to bootstrap core deps if missing.
   - No-preinstall fallback: If PrettyTables is not installed and you run files directly, the app will fall back to a simple ASCII table so it still runs.
 
+Quick Start
+- Unix/macOS
+  - julia -e 'using Pkg; Pkg.activate("."); Pkg.instantiate()'
+  - julia run.jl
+- Windows (PowerShell)
+  - julia -e "using Pkg; Pkg.activate(\".\"); Pkg.instantiate()"
+  - julia run.jl
+
 Run (CLI)
 - Option A: one-file launcher
   - julia run.jl
