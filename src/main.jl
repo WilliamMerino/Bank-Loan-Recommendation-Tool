@@ -1,18 +1,18 @@
 # Bootstrap dependencies: ensure CSV/DataFrames are available
 try
-    @eval using CSV, DataFrames
+    @eval using CSV, DataFrames, PrettyTables
 catch err
     @warn "Dependencies missing; activating project and instantiating..." err
     import Pkg
     Pkg.activate(dirname(@__DIR__))
     try
         Pkg.instantiate()
-        @eval using CSV, DataFrames
+        @eval using CSV, DataFrames, PrettyTables
     catch
         # Fallback: explicitly add core deps if instantiate is insufficient
-        Pkg.add(["CSV","DataFrames"]) 
+        Pkg.add(["CSV","DataFrames","PrettyTables"]) 
         Pkg.precompile()
-        @eval using CSV, DataFrames
+        @eval using CSV, DataFrames, PrettyTables
     end
 end
 

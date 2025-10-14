@@ -22,8 +22,9 @@ Setup
   - git clone https://github.com/<your-account>/Bank-Loan-Recommendation-Tool.git
   - cd Bank-Loan-Recommendation-Tool
   - julia --project=. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
-  - The project now has a valid Project.toml (name/uuid) so `using BankLoanRecommendationTool` works after `] activate .`.
-  - Note: src/main.jl will also attempt to bootstrap CSV/DataFrames if missing.
+  - Dependencies: CSV, DataFrames, PrettyTables
+  - The project has a valid Project.toml (name/uuid) so `using BankLoanRecommendationTool` works after `] activate .`.
+  - Note: src/main.jl will also attempt to bootstrap core deps if missing.
 
 Run (CLI)
 - Option A: one-file launcher

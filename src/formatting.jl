@@ -1,4 +1,5 @@
 using Statistics
+using PrettyTables
 
 function format_number_with_commas(n::Real; digits=2)::String
     if isnan(n) || isinf(n)
@@ -46,18 +47,12 @@ function format_table_row(row::Vector{String}, widths::Vector{Int}, alignments::
 end
 
 function print_table(headers::Vector{String}, rows::Vector{Vector{String}}; alignments::Union{Nothing, Vector{Symbol}}=nothing)
-    if alignments === nothing
-        alignments = fill(:left, length(headers))
+    data = rows
+    alignment_pt = if alignments === nothing
+        :l
+    else
+        # Map :left/:right to PrettyTables symbols :l/:r
+        map(a -> a === :right ? :r : :l, alignments)
     end
-    header_alignments = fill(:left, length(headers))
-    widths = compute_column_widths(headers, rows)
-    top_border = make_separator('-', widths)
-    header_border = make_separator('=', widths)
-    println(top_border)
-    println(format_table_row(headers, widths, header_alignments))
-    println(header_border)
-    for row in rows
-        println(format_table_row(row, widths, alignments))
-    end
-    println(top_border)
+    pretty_table(data; header=headers, alignment=alignment_pt)
 end
