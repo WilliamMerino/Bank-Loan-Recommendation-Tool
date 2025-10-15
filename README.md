@@ -49,7 +49,7 @@ Run (CLI)
 Run Tests
 - From repo root:
   - julia --project test/runtests.jl
-  - julia --project test/test_validation.jl _ To validate the rows newly entered rows in the raw CSV file. 
+  - julia --project test/test_validation.jl - To validate the rows newly entered rows in the raw CSV file. 
 
 CSV Expectations
 - Required columns (case-insensitive names are normalized):
