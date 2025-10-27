@@ -5,6 +5,7 @@ export load_data, normalize_columns,
        compute_risk_score,
        safe_mean, top_similar_by_dti,
         format_number_with_commas, format_currency, print_table,
+       validate_dataset, validate_dataset_file,
        make_recommendation,
        run_tool,
        start
@@ -14,6 +15,7 @@ include("grading.jl")
 include("formatting.jl")
 include("similarity.jl")
 include("reporting.jl")
+include("validation.jl")
 
 """
     run_tool()

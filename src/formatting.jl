@@ -55,14 +55,29 @@ end
 
 function print_table(headers::Vector{String}, rows::Vector{Vector{String}}; alignments::Union{Nothing, Vector{Symbol}}=nothing)
     if HAS_PRETTYTABLES
-        data = rows
+        # PrettyTables expects a matrix-like table. Convert rows -> Matrix{String} (nrows x ncols).
+        ncols = length(headers)
+        data_mat = if isempty(rows)
+            Matrix{String}(undef, 0, ncols)
+        else
+            # Each row vector turned into a 1 x ncols matrix, then vcat together.
+            reduce(vcat, (permutedims(r) for r in rows))
+        end
+
+        # Normalize alignments: ensure vector length == ncols (fallback to left)
         alignment_pt = if alignments === nothing
             :l
         else
-            # Map :left/:right to PrettyTables symbols :l/:r
-            map(a -> a === :right ? :r : :l, alignments)
+            als = map(a -> a === :right ? :r : :l, alignments)
+            if length(als) != ncols
+                # Fallback to uniform left alignment if mismatch to avoid errors
+                :l
+            else
+                als
+            end
         end
-        PrettyTables.pretty_table(data; header=headers, alignment=alignment_pt)
+        # Pass headers positionally for broader PrettyTables compatibility
+        PrettyTables.pretty_table(data_mat, headers; alignment=alignment_pt)
     else
         # Fallback ASCII renderer
         if alignments === nothing
