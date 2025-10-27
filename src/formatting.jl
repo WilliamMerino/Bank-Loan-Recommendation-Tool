@@ -76,8 +76,8 @@ function print_table(headers::Vector{String}, rows::Vector{Vector{String}}; alig
                 als
             end
         end
-        # Pass headers positionally for broader PrettyTables compatibility
-        PrettyTables.pretty_table(data_mat, headers; alignment=alignment_pt)
+        # PrettyTables v3 expects headers via `column_labels` keyword.
+        PrettyTables.pretty_table(data_mat; column_labels=headers, alignment=alignment_pt)
     else
         # Fallback ASCII renderer
         if alignments === nothing
